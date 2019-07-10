@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<h1>Vermont Pingolf - Summer 2019</h1>
+<br>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script type="text/javascript">
+$(document).ready(function() {
+  getStandingsJson(1097, "players");
+  getStandingsJson(1098, "teams");
+  function getStandingsJson(series, table) {
+    var xhttp = new XMLHttpRequest();
+    xhttp.onreadystatechange = function() {
+      if (this.readyState == 4 && this.status == 200) {
+        var standings = JSON.parse(this.responseText).overall;
+        var weekly = JSON.parse(this.responseText).tournament_points;
+        for (var i = 0; i < standings.length; i++) {
+          var obj = standings[i];
+          var player = obj.name.replace(" ", "");
+          var player_name = obj.name;
+          var week = [];
+          var points = obj.points;
+          var points_adjusted = obj.points_adj;
+          var position = obj.position;
+          for (var j = 0; j < weekly.length; j++) {
+            week.push(weekly[j].points[obj.player_id]);
+          }
+
+          // Fill in unfinished weeks with N/A's
+          for (var j = weekly.length; j < 8; j++) {
+            week.push("-");
+          }
+
+          week = week.map(v => v === undefined ? 'N/A' : v);
+
+          var markup = "" +
+          "<tr>" +
+            "<td>" + position + "</td>" +
+            "<td>" + player_name + "</td>" +
+            "<td>" + week[0] + "</td>" +
+            "<td>" + week[1] + "</td>" +
+            "<td>" + week[2] + "</td>" +
+            "<td>" + week[3] + "</td>" +
+            "<td>" + week[4] + "</td>" +
+            "<td>" + week[5] + "</td>" +
+            "<td>" + week[6] + "</td>" +
+            "<td>" + week[7] + "</td>" +
+            "<td>" + points + "</td>" +
+            "<td>" + points_adjusted + "</td>" +
+          "</tr>";
+          $("#" + table).append(markup);
+        }
+      }
+    };
+    xhttp.open("GET", "https://matchplay.events/data/series/" + series + "/standings", true);
+    xhttp.send();
+  }
+});
+</script>
+
+
+<h2>Individual Standings</h2>
+<a href="https://matchplay.events/live/series/1097">https://matchplay.events/live/series/1097</a>
+<table id="players">
+  <tr>
+    <th>Position</th>
+    <th>Player</th>
+    <th>Week 1</th>
+    <th>Week 2</th>
+    <th>Week 3</th>
+    <th>Week 4</th>
+    <th>Week 5</th>
+    <th>Week 6</th>
+    <th>Week 7</th>
+    <th>Week 8</th>
+    <th>Overall</th>
+    <th>Adjusted</th>
+  </tr>
+</table>
+<br>
+<h2>Team Standings</h2>
+<a href="https://matchplay.events/live/series/1098">https://matchplay.events/live/series/1098</a>
+<table id="teams">
+  <tr>
+    <th>Position</th>
+    <th>Team</th>
+    <th>Week 1</th>
+    <th>Week 2</th>
+    <th>Week 3</th>
+    <th>Week 4</th>
+    <th>Week 5</th>
+    <th>Week 6</th>
+    <th>Week 7</th>
+    <th>Week 8</th>
+    <th>Overall</th>
+    <th>Adjusted</th>
+  </tr>
+</table>
